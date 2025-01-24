@@ -15,17 +15,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
 
-      - name: List files
+      - name: Debug Info
         run: |
-          dir
           echo "Current directory:"
-          pwd
+          cd
+          echo "Directory contents:"
+          dir /s
+          echo "File content check:"
+          type wx_photo_archiver.py
 
       - name: Install dependencies
         run: |
@@ -35,6 +40,7 @@ jobs:
 
       - name: Build EXE
         run: |
+          echo "Build directory contents:"
           dir
           pyinstaller --onefile --name WxPhotoArchiver wx_photo_archiver.py
 
