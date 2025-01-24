@@ -14,9 +14,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
@@ -24,12 +23,13 @@ jobs:
           python-version: "3.10"
 
       - name: Debug Info
+        shell: cmd
         run: |
           echo "Current directory:"
           cd
           echo "Directory contents:"
-          dir /s
-          echo "File content check:"
+          dir /s /b
+          echo "Python file content:"
           type wx_photo_archiver.py
 
       - name: Install dependencies
@@ -39,6 +39,7 @@ jobs:
           pip install wcferry pillow python-dateutil
 
       - name: Build EXE
+        shell: cmd
         run: |
           echo "Build directory contents:"
           dir
