@@ -44,15 +44,18 @@ jobs:
 
       - name: Get wcferry path
         id: wcferry-path
+        shell: cmd
         run: |
-          echo "WCFERRY_PATH=$(python -c 'import wcferry; import os; print(os.path.dirname(wcferry.__file__))')" >> $GITHUB_ENV
+          FOR /F "tokens=*" %%g IN ('python -c "import wcferry,os;print(os.path.dirname(wcferry.__file__))"') do (SET "WCFERRY_PATH=%%g")
+          echo WCFERRY_PATH=%WCFERRY_PATH%
+          echo "wcferry_path=%WCFERRY_PATH%" >> %GITHUB_ENV%
 
       - name: Build EXE
         shell: cmd
         run: |
           echo "Build directory contents:"
           dir
-          pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "%WCFERRY_PATH%;wcferry" wx_photo_archiver.py
+          pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "%WCFERRY_PATH%\*;wcferry" wx_photo_archiver.py
           dir dist
 
       - name: Check Build Output
