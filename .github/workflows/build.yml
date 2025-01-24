@@ -3,10 +3,6 @@ name: Build EXE
 on:
   push:
     branches: [main]
-    tags:
-      - "v*"
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 # 添加权限配置
@@ -74,3 +70,9 @@ jobs:
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: WxPhotoArchiver
+          path: dist/WxPhotoArchiver.exe
