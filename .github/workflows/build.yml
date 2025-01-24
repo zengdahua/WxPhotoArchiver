@@ -42,12 +42,17 @@ jobs:
           pip install pyinstaller
           pip install wcferry pillow python-dateutil cffi
 
+      - name: Get wcferry path
+        id: wcferry-path
+        run: |
+          echo "WCFERRY_PATH=$(python -c 'import wcferry; import os; print(os.path.dirname(wcferry.__file__))')" >> $GITHUB_ENV
+
       - name: Build EXE
         shell: cmd
         run: |
           echo "Build directory contents:"
           dir
-          pyinstaller --onefile --add-data "C:\hostedtoolcache\windows\Python\3.10.11\x64\Lib\site-packages\wcferry;wcferry" --hidden-import=cffi --hidden-import=_cffi_backend wx_photo_archiver.py
+          pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "%WCFERRY_PATH%;wcferry" wx_photo_archiver.py
           dir dist
 
       - name: Check Build Output
