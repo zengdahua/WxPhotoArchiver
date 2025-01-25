@@ -92,6 +92,12 @@ class WxPhotoArchiver:
         """运行监听器"""
         try:
             logger.info("Starting WxPhotoArchiver...")
+            logger.info(f"WeChatFerry version: {self.wcf.get_version()}")
+            
+            # 记录微信版本，但不做版本限制
+            wx_version = self.wcf.get_wx_version()
+            logger.info(f"WeChat version: {wx_version}")
+            
             self.ensure_dir(self.base_path)
             
             # 等待微信登录
