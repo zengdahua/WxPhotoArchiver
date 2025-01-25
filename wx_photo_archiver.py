@@ -75,7 +75,7 @@ class WxPhotoArchiver:
             logger.info("Starting WxPhotoArchiver...")
             self.ensure_dir(self.base_path)
             # 注册消息回调
-            self.wcf.register_msg_callback(self.handle_message)
+            self.wcf.msg_callback = self.handle_message
             logger.info("Started listening for messages...")
             # 启动消息监听
             self.wcf.enable_recv_msg()
