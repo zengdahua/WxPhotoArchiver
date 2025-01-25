@@ -99,9 +99,12 @@ class WxPhotoArchiver:
                 time.sleep(1)
             logger.info("WeChat logged in successfully!")
             
+            # 确保目录存在
+            self.ensure_dir(self.base_path)
+            
             # 启动消息监听
             logger.info("Enabling message receiving...")
-            self.wcf.enable_recv_msg()
+            self.wcf.enable_receiving_msg()  # 使用新的方法名
             
             # 注册消息回调
             logger.info("Registering message callback...")
@@ -110,14 +113,17 @@ class WxPhotoArchiver:
             logger.info("Started listening for messages...")
             
             # 保持程序运行
-            while self.wcf.is_receiving_msg():
-                time.sleep(1)
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                logger.info("Received keyboard interrupt, shutting down...")
                 
-        except KeyboardInterrupt:
-            logger.info("Shutting down...")
         except Exception as e:
             logger.error(f"Error in main loop: {str(e)}", exc_info=True)
         finally:
+            # 停止接收消息
+            self.wcf.disable_recv_msg()
             self.wcf.cleanup()
             logger.info("Cleanup completed")
 
