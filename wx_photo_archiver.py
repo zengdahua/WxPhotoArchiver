@@ -36,8 +36,12 @@ class WxPhotoArchiver:
     def handle_message(self, msg: WxMsg):
         """处理接收到的消息"""
         try:
+            # 添加调试日志
+            logger.info(f"Received message - Type: {msg.type}, Sender: {msg.sender}")
+            
             # 只处理图片消息
             if msg.type != 3:  # 3 是图片消息类型
+                logger.debug(f"Skipping non-image message type: {msg.type}")
                 return
 
             # 获取发送者信息
@@ -47,6 +51,8 @@ class WxPhotoArchiver:
                 return
 
             sender_name = sender.name
+            logger.info(f"Processing image from: {sender_name}")
+            
             # 替换文件名中的非法字符
             sender_name = "".join(x for x in sender_name if x.isalnum() or x in (' ', '-', '_'))
             
@@ -74,11 +80,16 @@ class WxPhotoArchiver:
         try:
             logger.info("Starting WxPhotoArchiver...")
             self.ensure_dir(self.base_path)
-            # 注册消息回调
-            self.wcf.msg_callback = self.handle_message
-            logger.info("Started listening for messages...")
+            
             # 启动消息监听
+            logger.info("Enabling message receiving...")
             self.wcf.enable_recv_msg()
+            
+            # 注册消息回调
+            logger.info("Registering message callback...")
+            self.wcf.msg_callback = self.handle_message
+            
+            logger.info("Started listening for messages...")
             while True:
                 time.sleep(1)
                 
