@@ -19,6 +19,8 @@ class WxPhotoArchiver:
         self.wcf = Wcf()
         # 基础保存路径
         self.base_path = "C:\\photo"
+        # 注册消息回调
+        self.wcf.on_message(self.handle_message)
         
     def ensure_dir(self, path):
         """确保目录存在，如果不存在则创建"""
@@ -74,7 +76,6 @@ class WxPhotoArchiver:
         try:
             logger.info("Starting WxPhotoArchiver...")
             self.ensure_dir(self.base_path)
-            self.wcf.register_msg_callback(self.handle_message)
             logger.info("Started listening for messages...")
             while True:
                 time.sleep(1)
