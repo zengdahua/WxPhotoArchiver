@@ -21,12 +21,17 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
+          architecture: "x64"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install wcferry pillow python-dateutil cffi
+
+      - name: Check Python Architecture
+        run: |
+          python -c "import platform; print('Python Architecture:', platform.architecture())"
 
       - name: Build EXE
         shell: cmd
@@ -35,7 +40,7 @@ jobs:
           dir
           echo "WCFerry path:"
           python -c "import wcferry,os;print(os.path.dirname(wcferry.__file__))"
-          pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "C:\hostedtoolcache\windows\Python\3.10.11\x64\Lib\site-packages\wcferry;wcferry" wx_photo_archiver.py
+          pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "C:\hostedtoolcache\windows\Python\3.10.11\x64\Lib\site-packages\wcferry;wcferry" --target-architecture x64 wx_photo_archiver.py
           echo "After build:"
           dir
           echo "Dist folder contents:"
