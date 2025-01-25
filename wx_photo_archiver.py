@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from wcferry import Wcf
+from wcferry import Wcf, WxMsg
 import time
 import logging
 
@@ -20,7 +20,7 @@ class WxPhotoArchiver:
         # 基础保存路径
         self.base_path = "C:\\photo"
         # 注册消息回调
-        self.wcf.on_message(self.handle_message)
+        self.wcf.register_msg_callback(self.handle_message)
         
     def ensure_dir(self, path):
         """确保目录存在，如果不存在则创建"""
@@ -35,7 +35,7 @@ class WxPhotoArchiver:
         self.ensure_dir(save_path)
         return save_path
 
-    def handle_message(self, msg):
+    def handle_message(self, msg: WxMsg):
         """处理接收到的消息"""
         try:
             # 只处理图片消息
@@ -77,6 +77,8 @@ class WxPhotoArchiver:
             logger.info("Starting WxPhotoArchiver...")
             self.ensure_dir(self.base_path)
             logger.info("Started listening for messages...")
+            # 启动消息监听
+            self.wcf.enable_recv_msg()
             while True:
                 time.sleep(1)
                 
