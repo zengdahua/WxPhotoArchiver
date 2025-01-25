@@ -3,6 +3,8 @@ name: Build EXE
 on:
   push:
     branches: [main]
+    tags:
+      - "v*" # 触发所有以v开头的标签
   workflow_dispatch:
 
 # 添加权限配置
