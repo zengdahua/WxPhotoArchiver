@@ -33,19 +33,30 @@ jobs:
         run: |
           echo "Build directory contents:"
           dir
+          echo "WCFerry path:"
+          python -c "import wcferry,os;print(os.path.dirname(wcferry.__file__))"
           pyinstaller --onefile --hidden-import=cffi --hidden-import=_cffi_backend --add-data "C:\hostedtoolcache\windows\Python\3.10.11\x64\Lib\site-packages\wcferry;wcferry" wx_photo_archiver.py
+          echo "After build:"
+          dir
+          echo "Dist folder contents:"
           dir dist
 
-      - name: Check Build Output
+      - name: List All Files
         shell: cmd
         run: |
-          echo "Checking dist directory:"
-          dir dist
-          echo "Current directory:"
-          dir
+          echo "Full directory listing:"
+          dir /s /b
+
+      - name: Upload Artifact (with search)
+        shell: cmd
+        run: |
+          for /r %%i in (WxPhotoArchiver.exe) do (
+            echo Found: %%i
+            echo "ARTIFACT_PATH=%%i" >> %GITHUB_ENV%
+          )
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: WxPhotoArchiver
-          path: dist/WxPhotoArchiver.exe
+          path: ${{ env.ARTIFACT_PATH }}
