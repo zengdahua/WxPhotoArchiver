@@ -38,10 +38,16 @@ class WxPhotoArchiver:
         try:
             # 添加调试日志
             logger.info(f"Received message - Type: {msg.type}, Sender: {msg.sender}")
+            logger.info(f"Message details - ID: {msg.id}, Extra: {msg.extra}, Thumb: {msg.thumb}")
             
             # 只处理图片消息
             if msg.type != 3:  # 3 是图片消息类型
                 logger.debug(f"Skipping non-image message type: {msg.type}")
+                return
+
+            # 忽略自己发送的消息
+            if msg.from_self():
+                logger.debug("Skipping self-sent message")
                 return
 
             # 获取发送者信息
@@ -52,6 +58,13 @@ class WxPhotoArchiver:
 
             sender_name = sender.name
             logger.info(f"Processing image from: {sender_name}")
+            
+            # 如果是群消息，添加群名前缀
+            if msg.from_group():
+                group_info = self.wcf.get_info_by_wxid(msg.roomid)
+                if group_info:
+                    sender_name = f"{group_info.name}_{sender_name}"
+                    logger.info(f"Group message from: {group_info.name}")
             
             # 替换文件名中的非法字符
             sender_name = "".join(x for x in sender_name if x.isalnum() or x in (' ', '-', '_'))
