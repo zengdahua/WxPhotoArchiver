@@ -41,22 +41,10 @@ jobs:
           echo "Dist folder contents:"
           dir dist
 
-      - name: List All Files
-        shell: cmd
-        run: |
-          echo "Full directory listing:"
-          dir /s /b
-
-      - name: Upload Artifact (with search)
-        shell: cmd
-        run: |
-          for /r %%i in (WxPhotoArchiver.exe) do (
-            echo Found: %%i
-            echo "ARTIFACT_PATH=%%i" >> %GITHUB_ENV%
-          )
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
+        if: success()
         with:
           name: WxPhotoArchiver
-          path: ${{ env.ARTIFACT_PATH }}
+          path: |
+            dist/*.exe
