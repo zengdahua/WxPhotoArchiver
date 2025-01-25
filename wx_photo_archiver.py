@@ -82,12 +82,13 @@ def main():
         time.sleep(1)
     logger.info("WeChat logged in successfully!")
     
-    # 注册消息回调
-    wcf.on_message(on_message)
-    
     # 启动消息接收
     wcf.enable_receiving_msg()
-    logger.info("Started listening for messages...")
+    logger.info("Started receiving messages...")
+    
+    # 注册消息回调
+    wcf.msg_callback = on_message
+    logger.info("Message callback registered...")
     
     try:
         while wcf.is_login():
