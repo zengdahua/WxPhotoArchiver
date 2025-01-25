@@ -73,32 +73,54 @@ def on_message(wcf: Wcf, msg: WxMsg):
         logger.error(f"Error processing message: {str(e)}", exc_info=True)
 
 def main():
-    wcf = Wcf()
-    logger.info("Starting WxPhotoArchiver...")
+    max_retries = 3
+    retry_count = 0
     
-    # 等待微信登录
-    logger.info("Waiting for WeChat login...")
-    while not wcf.is_login():
-        time.sleep(1)
-    logger.info("WeChat logged in successfully!")
-    
-    # 启动消息接收
-    wcf.enable_receiving_msg()
-    logger.info("Started receiving messages...")
-    
-    # 注册消息回调
-    wcf.msg_callback = on_message
-    logger.info("Message callback registered...")
-    
-    try:
-        while wcf.is_login():
-            time.sleep(1)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        wcf.disable_recv_msg()
-        wcf.cleanup()
-        logger.info("Cleanup completed")
+    while retry_count < max_retries:
+        try:
+            wcf = Wcf()
+            logger.info("Starting WxPhotoArchiver...")
+            
+            # 等待微信登录
+            logger.info("Waiting for WeChat login...")
+            while not wcf.is_login():
+                time.sleep(1)
+            logger.info("WeChat logged in successfully!")
+            
+            # 启动消息接收
+            wcf.enable_receiving_msg()
+            logger.info("Started receiving messages...")
+            
+            # 注册消息回调
+            wcf.msg_callback = on_message
+            logger.info("Message callback registered...")
+            
+            # 主循环
+            while wcf.is_login():
+                time.sleep(1)
+            
+            break  # 如果正常退出循环，就跳出重试
+            
+        except Exception as e:
+            retry_count += 1
+            logger.error(f"Error occurred (attempt {retry_count}/{max_retries}): {str(e)}", exc_info=True)
+            
+            if retry_count < max_retries:
+                logger.info("Retrying in 5 seconds...")
+                time.sleep(5)
+            else:
+                logger.error("Max retries reached. Please make sure WeChatFerry service is running.")
+                logger.error("You can try these steps:")
+                logger.error("1. Make sure WeChat is running")
+                logger.error("2. Run WeChatFerry service (wcf.exe)")
+                logger.error("3. Try again")
+        finally:
+            try:
+                wcf.disable_recv_msg()
+                wcf.cleanup()
+                logger.info("Cleanup completed")
+            except:
+                pass
 
 if __name__ == "__main__":
     main() 
