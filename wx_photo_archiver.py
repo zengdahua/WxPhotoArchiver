@@ -94,6 +94,12 @@ class WxPhotoArchiver:
             logger.info("Starting WxPhotoArchiver...")
             self.ensure_dir(self.base_path)
             
+            # 等待微信登录
+            logger.info("Waiting for WeChat login...")
+            while not self.wcf.is_login():
+                time.sleep(1)
+            logger.info("WeChat logged in successfully!")
+            
             # 启动消息监听
             logger.info("Enabling message receiving...")
             self.wcf.enable_recv_msg()
@@ -103,7 +109,9 @@ class WxPhotoArchiver:
             self.wcf.msg_callback = self.handle_message
             
             logger.info("Started listening for messages...")
-            while True:
+            
+            # 保持程序运行
+            while self.wcf.is_receiving_msg():
                 time.sleep(1)
                 
         except KeyboardInterrupt:
